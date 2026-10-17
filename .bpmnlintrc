@@ -1,0 +1,20 @@
+{
+  "extends": ["bpmnlint:recommended", "plugin:bpmn-mcp/recommended"],
+  "rules": {
+    "label-required": "warn",
+    "no-disconnected": "warn",
+    "no-overlapping-elements": "off",
+    "fake-join": "info",
+    "bpmn-mcp/gateway-pair-mismatch": "info",
+    "bpmn-mcp/naming-convention": "off",
+    "bpmn-mcp/gateway-missing-default": "off",
+    "bpmn-mcp/exclusive-gateway-conditions": "off",
+    "bpmn-mcp/user-task-missing-assignee": "off",
+    "bpmn-mcp/lane-without-assignments": "off",
+    "bpmn-mcp/role-mismatch-with-lane": "off",
+    "bpmn-mcp/inconsistent-assignee-grouping": "off",
+    "bpmn-mcp/undefined-variable": "off",
+    "bpmn-mcp/service-task-missing-implementation": "off",
+    "bpmn-mcp/camunda-topic-without-external-type": "off"
+  }
+}

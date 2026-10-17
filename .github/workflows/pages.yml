@@ -1,0 +1,47 @@
+# Publica el modelador en GitHub Pages:
+#   https://<usuario>.github.io/<repositorio>/
+# Activación (una sola vez): Settings > Pages > Source: "GitHub Actions".
+name: Publicar modelador en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modelador/**'
+      - 'diagramas/**'
+      - 'scripts/construir-sitio.mjs'
+      - 'scripts/lib/**'
+      - 'package-lock.json'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # Solo hace falta bpmn-js (sin compilar el servidor MCP).
+      - run: npm ci --ignore-scripts
+      - run: npm run sitio
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _sitio
+      - id: despliegue
+        uses: actions/deploy-pages@v4

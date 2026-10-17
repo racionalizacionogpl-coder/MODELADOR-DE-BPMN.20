@@ -1,0 +1,26 @@
+{
+  "enabledMcpjsonServers": [
+    "bpmn"
+  ],
+  "permissions": {
+    "allow": [
+      "mcp__bpmn",
+      "Bash(npm run bpmn:*)",
+      "Bash(npm run pagina:*)",
+      "Bash(npm test)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/preparar-sesion.mjs\"",
+            "timeout": 600
+          }
+        ]
+      }
+    ]
+  }
+}

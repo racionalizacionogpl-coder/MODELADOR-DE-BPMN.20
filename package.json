@@ -1,0 +1,23 @@
+{
+  "name": "modelador-de-bpmn-20",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Claude Code + MCP de BPMN 2.0 (bpmn-js-mcp) + modelador web en vivo + subida a Camunda",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "modelador": "node scripts/servidor-modelador.mjs",
+    "camunda": "node scripts/subir-a-camunda.mjs",
+    "pagina": "node scripts/pagina-modelador.mjs",
+    "bpmn": "node scripts/bpmn-cli.mjs",
+    "mcp": "node scripts/iniciar-mcp-bpmn.mjs",
+    "sitio": "node scripts/construir-sitio.mjs",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "bpmn-js-mcp": "git+https://github.com/datakurre/bpmn-js-mcp.git#ad1a9c30bbbfb1ef7df490cb571815b99d0ffdb4"
+  }
+}

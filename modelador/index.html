@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Modelador BPMN 2.0</title>
+    <meta name="description" content="Modelador BPMN 2.0 (bpmn-js) conectado con Claude Code: muestra en vivo los diagramas que Claude genera." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='5' fill='%23e8590c'/%3E%3Cpath d='M16 9l7 7-7 7-7-7z' fill='white'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="estilos.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <div class="marca">
+        <button class="boton icono solo-movil" id="btn-panel" type="button" aria-label="Mostrar diagramas" aria-expanded="false">☰</button>
+        <span class="logo" aria-hidden="true"></span>
+        <div class="titulos">
+          <h1>Modelador BPMN 2.0</h1>
+          <p id="titulo-diagrama" class="subtitulo">Sin diagrama abierto</p>
+        </div>
+      </div>
+      <span id="estado" class="estado" title="Modo de trabajo">Cargando…</span>
+      <nav class="acciones" aria-label="Acciones del diagrama">
+        <button class="boton" id="btn-nuevo" type="button">Nuevo</button>
+        <button class="boton" id="btn-abrir" type="button">Abrir…</button>
+        <input id="entrada-archivo" type="file" accept=".bpmn,.xml" hidden />
+        <button class="boton" id="btn-guardar" type="button">Guardar</button>
+        <button class="boton" id="btn-bpmn" type="button">Descargar .bpmn</button>
+        <button class="boton" id="btn-svg" type="button">Descargar SVG</button>
+        <button class="boton" id="btn-camunda" type="button" hidden>Subir a Camunda</button>
+        <button class="boton icono" id="btn-ajustar" type="button" title="Ajustar a la pantalla" aria-label="Ajustar a la pantalla">⤢</button>
+      </nav>
+    </header>
+
+    <div class="cuerpo">
+      <aside class="panel" id="panel" aria-label="Diagramas">
+        <label class="seguir" id="opcion-seguir">
+          <input type="checkbox" id="seguir" checked />
+          Seguir a Claude: abrir lo que esté dibujando
+        </label>
+        <section>
+          <h2>Diagramas</h2>
+          <ul class="lista" id="lista-diagramas"></ul>
+        </section>
+        <section id="seccion-mcp">
+          <h2>En construcción por Claude</h2>
+          <ul class="lista" id="lista-mcp"></ul>
+        </section>
+        <p class="ayuda">
+          Arrastra un archivo <code>.bpmn</code> sobre el lienzo para abrirlo.
+        </p>
+      </aside>
+
+      <main class="area">
+        <div class="aviso" id="aviso" hidden>
+          <span>Claude actualizó este diagrama mientras tenías cambios sin guardar.</span>
+          <button class="boton primario" id="btn-aviso-cargar" type="button">Ver versión de Claude</button>
+          <button class="boton" id="btn-aviso-ignorar" type="button">Mantener mis cambios</button>
+        </div>
+        <div id="lienzo" class="lienzo"></div>
+        <div class="vacio" id="vacio">
+          <p><strong>Pídele a Claude un diagrama BPMN 2.0</strong> y aparecerá aquí.</p>
+          <p>También puedes abrir o arrastrar un archivo <code>.bpmn</code>.</p>
+        </div>
+        <div class="soltar" id="soltar" hidden>Suelta el archivo .bpmn para abrirlo</div>
+      </main>
+    </div>
+
+    <div class="notificaciones" id="notificaciones" role="status" aria-live="polite"></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

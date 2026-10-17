@@ -1,0 +1,16 @@
+node_modules/
+
+# Credenciales de Camunda (nunca se suben al repositorio)
+.env
+
+# Diagramas en construcción que guarda el servidor MCP (--persist-dir)
+.bpmn-mcp/
+
+# Candado temporal mientras se instalan las dependencias
+.instalando.lock/
+
+.DS_Store
+
+# Páginas autocontenidas generadas con "npm run pagina" y sitio de GitHub Pages
+exportados/
+_sitio/

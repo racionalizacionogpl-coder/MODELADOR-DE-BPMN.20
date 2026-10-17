@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "bpmn": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/scripts/iniciar-mcp-bpmn.mjs"]
+    }
+  }
+}
