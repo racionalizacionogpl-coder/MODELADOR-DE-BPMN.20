@@ -36,6 +36,8 @@ const DIAGRAMA_NUEVO = `<?xml version="1.0" encoding="UTF-8"?>
 const $ = (id) => document.getElementById(id);
 const parametros = new URLSearchParams(location.search);
 const INCRUSTADO = window.DIAGRAMA_INCRUSTADO ?? null;
+// Publicada como Artifact de claude.ai: el visor bloquea descargas y diálogos.
+const EN_ARTIFACT = Boolean(INCRUSTADO?.artifact);
 
 const estado = {
   modo: 'en-linea', // 'local' | 'en-linea' | 'incrustado'
@@ -65,6 +67,11 @@ function notificar(texto, { error = false, enlace = null, duracion = 4500 } = {}
   }
   $('notificaciones').append(nodo);
   setTimeout(() => nodo.remove(), enlace ? duracion * 3 : duracion);
+}
+
+/** confirm() no existe dentro de un Artifact (devuelve false sin mostrarse). */
+function confirmar(pregunta) {
+  return EN_ARTIFACT || confirm(pregunta);
 }
 
 function intentar(accion) {
@@ -167,7 +174,8 @@ function actualizarTitulo() {
   }
   const ubicacion = actual.origen === 'mcp' ? 'en construcción por Claude' : actual.archivo ? `diagramas/${actual.archivo}` : '';
   titulo.textContent = `${actual.nombre}${estado.sucio ? ' • sin guardar' : ''}${ubicacion ? ` — ${ubicacion}` : ''}`;
-  document.title = `${estado.sucio ? '• ' : ''}${actual.nombre} · Modelador BPMN 2.0`;
+  const sufijo = estado.modo === 'incrustado' ? '' : ' · Modelador BPMN 2.0';
+  document.title = `${estado.sucio ? '• ' : ''}${actual.nombre}${sufijo}`;
 }
 
 function mismaVista(a, b) {
@@ -228,7 +236,7 @@ async function importar(xml, { conservarVista = false } = {}) {
 }
 
 async function abrir(entrada, opciones = {}) {
-  if (estado.sucio && !opciones.forzar && !confirm('Tienes cambios sin guardar. ¿Abrir otro diagrama de todos modos?')) {
+  if (estado.sucio && !opciones.forzar && !confirmar('Tienes cambios sin guardar. ¿Abrir otro diagrama de todos modos?')) {
     return;
   }
   const xml = await pedirTexto(entrada.url);
@@ -395,7 +403,7 @@ async function guardar() {
     if (!elegido) return;
     archivo = elegido.endsWith('.bpmn') ? elegido : `${elegido}.bpmn`;
     const existe = estado.lista.some((d) => d.origen === 'diagramas' && d.archivo === archivo);
-    if (existe && !confirm(`diagramas/${archivo} ya existe. ¿Reemplazarlo?`)) return;
+    if (existe && !confirmar(`diagramas/${archivo} ya existe. ¿Reemplazarlo?`)) return;
   }
 
   const respuesta = await fetch(urlApi('diagramas', archivo), {
@@ -431,9 +439,22 @@ async function subirACamunda() {
   }
 }
 
+/** Copia el BPMN XML; si el portapapeles no está disponible, lo muestra para copiarlo a mano. */
+async function copiarXml() {
+  const { xml } = await modelador.saveXML({ format: true });
+  try {
+    await navigator.clipboard.writeText(xml);
+    notificar('BPMN copiado. Pégalo en un archivo .bpmn o en Camunda Modeler.');
+  } catch {
+    $('texto-xml').value = xml;
+    $('panel-xml').hidden = false;
+    $('texto-xml').select();
+  }
+}
+
 async function abrirArchivoLocal(archivo) {
   if (!archivo) return;
-  if (estado.sucio && !confirm('Tienes cambios sin guardar. ¿Abrir el archivo de todos modos?')) return;
+  if (estado.sucio && !confirmar('Tienes cambios sin guardar. ¿Abrir el archivo de todos modos?')) return;
   await importar(await archivo.text());
   estado.actual = { nombre: archivo.name.replace(/\.(bpmn|xml)$/i, '') };
   actualizarTitulo();
@@ -444,7 +465,7 @@ function enlazarInterfaz() {
   $('btn-nuevo').addEventListener(
     'click',
     intentar(async () => {
-      if (estado.sucio && !confirm('Tienes cambios sin guardar. ¿Empezar un diagrama nuevo?')) return;
+      if (estado.sucio && !confirmar('Tienes cambios sin guardar. ¿Empezar un diagrama nuevo?')) return;
       await importar(DIAGRAMA_NUEVO);
       estado.actual = { nombre: 'Diagrama nuevo' };
       recordarEnUrl(estado.actual);
@@ -476,6 +497,10 @@ function enlazarInterfaz() {
     })
   );
   $('btn-camunda').addEventListener('click', intentar(subirACamunda));
+  $('btn-copiar').addEventListener('click', intentar(copiarXml));
+  $('btn-xml-cerrar').addEventListener('click', () => {
+    $('panel-xml').hidden = true;
+  });
   $('btn-ajustar').addEventListener('click', () => encuadrar());
   $('btn-aviso-cargar').addEventListener(
     'click',
@@ -583,6 +608,10 @@ async function iniciar() {
     $('panel').hidden = true;
     $('btn-panel').hidden = true;
     $('btn-guardar').hidden = true;
+    if (EN_ARTIFACT) {
+      for (const id of ['btn-nuevo', 'btn-bpmn', 'btn-svg']) $(id).hidden = true;
+      $('btn-copiar').hidden = false;
+    }
     pill.textContent = 'Copia independiente';
     pill.title = 'Edita y descarga el diagrama; los cambios no se guardan en el proyecto';
     await importar(INCRUSTADO.xml);

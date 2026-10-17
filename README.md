@@ -119,8 +119,9 @@ npm run pagina -- diagramas/solicitud-de-compra.bpmn
 
 Genera `exportados/solicitud-de-compra.html`: el modelador completo con el
 diagrama incrustado, **en un solo archivo** que funciona sin servidor ni
-internet. En Claude Code en la web, Claude lo publica como **Artifact** y te da
-un enlace privado de claude.ai que puedes compartir.
+internet. En Claude Code en la web, Claude genera la variante `--artifact` y la
+publica como **Artifact**: un enlace privado de claude.ai que puedes compartir,
+donde se edita el diagrama y se copia su BPMN (el visor no permite descargas).
 
 ### 3. GitHub Pages (modelador en línea del repositorio)
 

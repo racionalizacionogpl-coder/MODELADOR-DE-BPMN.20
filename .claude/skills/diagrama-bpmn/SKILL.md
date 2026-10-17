@@ -82,11 +82,17 @@ El modelador en vivo muestra el diagrama mientras lo dibujas y al exportarlo.
 
 **B. En la nube (claude.ai/code, `CLAUDE_CODE_REMOTE=true`).** El usuario no
 puede abrir `localhost`. Entonces:
-1. Genera la página del modelador con el diagrama incrustado:
-   `npm run pagina -- diagramas/<slug>.bpmn --salida <dir-temporal>/<slug>.html`
-   (usa tu scratchpad si tienes uno; sin `--salida` queda en `exportados/`).
-2. Si tienes la herramienta Artifact, publica ese archivo y da el enlace: es
-   un modelador editable en línea (privado hasta que el usuario lo comparta).
+1. Genera la página del modelador con el diagrama incrustado, en la variante
+   para Artifact (sin envoltorio `<html>` y con «Copiar BPMN» en lugar de
+   descargas, que el visor bloquea):
+   `npm run pagina -- diagramas/<slug>.bpmn --artifact --salida <dir-temporal>/<slug>.html`
+   (usa tu scratchpad si tienes uno).
+2. Si tienes la herramienta Artifact, publica ese archivo (icono `diagram`) y
+   da el enlace: es un modelador editable en línea, privado hasta que el
+   usuario lo comparta. Para actualizar el mismo diagrama, vuelve a generar el
+   archivo en la misma ruta y publícalo de nuevo (mismo enlace).
+   Sin `--artifact` se obtiene un HTML para abrir con doble clic o enviar por
+   correo (queda en `exportados/` si no indicas `--salida`).
 3. Haz commit y push del `.bpmn`/`.svg` en la rama de trabajo. Si el repositorio
    tiene GitHub Pages activo, el modelador en línea lo abre con:
    `https://<dueño>.github.io/<repositorio>/?rama=<rama>&archivo=diagramas/<slug>.bpmn`

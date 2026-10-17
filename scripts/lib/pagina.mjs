@@ -11,7 +11,12 @@ import { CARPETA_BPMN_JS, CARPETA_WEB } from './rutas.mjs';
 const protegerScript = (codigo) => codigo.replace(/<\/script/gi, '<\\/script');
 const protegerEstilo = (codigo) => codigo.replace(/<\/style/gi, '<\\/style');
 
-export async function paginaAutocontenida({ xml, nombre }) {
+/**
+ * Con `paraArtifact`, la página sale sin <!doctype>/<html>/<head>/<body> (el
+ * visor de claude.ai pone los suyos) y cambia las descargas, que ese visor
+ * bloquea, por un botón para copiar el XML.
+ */
+export async function paginaAutocontenida({ xml, nombre, paraArtifact = false }) {
   const leer = (base, relativa) => readFile(path.join(base, relativa), 'utf8');
   const [html, estilos, app, bpmnJs, ...cssBpmnJs] = await Promise.all([
     leer(CARPETA_WEB, 'index.html'),
@@ -24,10 +29,19 @@ export async function paginaAutocontenida({ xml, nombre }) {
   ]);
 
   // JSON dentro de <script>: escapamos "<" para que el XML no pueda cerrar la etiqueta.
-  const datos = JSON.stringify({ xml, nombre }).replace(/</g, '\\u003c');
+  const datos = JSON.stringify({ xml, nombre, ...(paraArtifact ? { artifact: true } : {}) }).replace(/</g, '\\u003c');
   const titulo = nombre.replace(/[<>&"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
-  return html
+  // El envoltorio se quita de la plantilla antes de incrustar el código, para
+  // no tocar cadenas parecidas dentro de bpmn-js.
+  const plantilla = paraArtifact
+    ? html
+        .replace(/^<!doctype html>\s*/i, '')
+        .replace(/<\/?(?:html|head|body)\b[^>]*>\s*/g, '')
+        .replace(/<meta (?:charset|name="viewport")[^>]*>\s*/g, '')
+    : html;
+
+  return plantilla
     .replace('<title>Modelador BPMN 2.0</title>', () => `<title>${titulo}</title>`)
     .replace(
       '<link rel="stylesheet" href="estilos.css" />',

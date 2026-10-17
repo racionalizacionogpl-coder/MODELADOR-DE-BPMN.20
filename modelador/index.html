@@ -26,6 +26,7 @@
         <button class="boton" id="btn-guardar" type="button">Guardar</button>
         <button class="boton" id="btn-bpmn" type="button">Descargar .bpmn</button>
         <button class="boton" id="btn-svg" type="button">Descargar SVG</button>
+        <button class="boton" id="btn-copiar" type="button" hidden>Copiar BPMN (XML)</button>
         <button class="boton" id="btn-camunda" type="button" hidden>Subir a Camunda</button>
         <button class="boton icono" id="btn-ajustar" type="button" title="Ajustar a la pantalla" aria-label="Ajustar a la pantalla">⤢</button>
       </nav>
@@ -62,6 +63,11 @@
           <p>También puedes abrir o arrastrar un archivo <code>.bpmn</code>.</p>
         </div>
         <div class="soltar" id="soltar" hidden>Suelta el archivo .bpmn para abrirlo</div>
+        <div class="panel-xml" id="panel-xml" hidden>
+          <label for="texto-xml">Copia este BPMN XML (Ctrl+C / Cmd+C) y guárdalo como archivo .bpmn:</label>
+          <textarea id="texto-xml" readonly spellcheck="false"></textarea>
+          <button class="boton" id="btn-xml-cerrar" type="button">Cerrar</button>
+        </div>
       </main>
     </div>
 

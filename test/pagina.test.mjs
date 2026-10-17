@@ -16,6 +16,21 @@ test('la página autocontenida incluye bpmn-js, la app y el diagrama sin referen
   assert.doesNotMatch(html, /A<\/script>/);
 });
 
+test('la versión para Artifact no trae envoltorio html/body y desactiva las descargas', async () => {
+  const xml = '<bpmn:definitions><bpmn:process name="P"/></bpmn:definitions>';
+  const normal = await paginaAutocontenida({ xml, nombre: 'P' });
+  const artifact = await paginaAutocontenida({ xml, nombre: 'P', paraArtifact: true });
+
+  assert.match(normal, /^<!doctype html>/i);
+  assert.doesNotMatch(artifact.slice(0, 2000), /<!doctype|<html|<head>|<body>|<meta charset/i);
+  assert.match(artifact.slice(0, 8192), /<title>P<\/title>/);
+  assert.match(artifact, /"artifact":true/);
+  assert.doesNotMatch(normal, /"artifact":true/);
+  // El código incrustado queda intacto: la página solo difiere en el envoltorio y la marca.
+  const sinMarca = artifact.replace(',"artifact":true', '');
+  assert.ok(normal.includes(sinMarca.slice(sinMarca.indexOf('<script>'))));
+});
+
 test('utilidades de nombres', () => {
   assert.equal(aSlug('Solicitud de Compra — Área Norte'), 'solicitud-de-compra-area-norte');
   assert.equal(aSlug('¿?'), 'diagrama');

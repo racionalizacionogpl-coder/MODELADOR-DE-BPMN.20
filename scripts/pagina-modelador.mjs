@@ -5,6 +5,7 @@
 //
 //   npm run pagina -- diagramas/solicitud-de-compra.bpmn
 //   npm run pagina -- diagramas/x.bpmn --salida /ruta/x.html
+//   npm run pagina -- diagramas/x.bpmn --artifact     (para publicar como Artifact de claude.ai)
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -14,11 +15,11 @@ import { RAIZ, aSlug, nombreDelXml } from './lib/rutas.mjs';
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
-  options: { salida: { type: 'string' }, nombre: { type: 'string' } },
+  options: { salida: { type: 'string' }, nombre: { type: 'string' }, artifact: { type: 'boolean', default: false } },
 });
 
 if (!positionals[0]) {
-  console.log('Uso: npm run pagina -- <archivo.bpmn> [--salida <archivo.html>] [--nombre <título>]');
+  console.log('Uso: npm run pagina -- <archivo.bpmn> [--salida <archivo.html>] [--nombre <título>] [--artifact]');
   process.exit(1);
 }
 
@@ -28,7 +29,7 @@ try {
   const nombre = values.nombre || nombreDelXml(xml, path.basename(origen, '.bpmn'));
   const salida = path.resolve(values.salida || path.join(RAIZ, 'exportados', `${aSlug(nombre)}.html`));
   await mkdir(path.dirname(salida), { recursive: true });
-  await writeFile(salida, await paginaAutocontenida({ xml, nombre }), 'utf8');
+  await writeFile(salida, await paginaAutocontenida({ xml, nombre, paraArtifact: values.artifact }), 'utf8');
   console.log(`Página del modelador generada: ${path.relative(process.cwd(), salida) || salida}`);
 } catch (error) {
   console.error(`Error: ${error.message}`);
